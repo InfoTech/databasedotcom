@@ -105,9 +105,16 @@ module Databasedotcom
         req = https_request(self.host)
         user = self.username || options[:username]
         pass = self.password || options[:password]
-        path = encode_path_with_params('/services/oauth2/token', :grant_type => 'password', :client_id => self.client_id, :client_secret => self.client_secret, :username => user, :password => pass)
-        log_request("https://#{self.host}/#{path}")
-        result = req.post(path, "")
+        path = '/services/oauth2/token'
+        params = encode_parameters({
+            :grant_type => 'password',
+            :client_id => self.client_id,
+            :client_secret => self.client_secret,
+            :username => user,
+            :password => pass
+        })
+        log_request("https://#{self.host}/#{path}?#{params}")
+        result = req.post(path, params)
         log_response(result)
         raise SalesForceError.new(result) unless result.is_a?(Net::HTTPOK)
         self.username = user
